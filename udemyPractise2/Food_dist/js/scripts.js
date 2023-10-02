@@ -112,9 +112,9 @@ window.addEventListener("DOMContentLoaded", () => {
           openModalButtons = document.querySelectorAll("[data-modal]"),
           closeModalButtons = document.querySelectorAll("[data-close]");
 
-    const modalTimerId = setTimeout(() => {
-            openModalWindow(modalWindow);
-          }, 5000);
+    // const modalTimerId = setTimeout(() => {
+    //         openModalWindow(modalWindow);
+    //       }, 5000);
 
     function openModalWindow(modalElement) {
         modalElement.classList.toggle("show");
@@ -159,6 +159,81 @@ window.addEventListener("DOMContentLoaded", () => {
     }
 
     window.addEventListener("scroll", showModalByScroll);
+
+    // Samples for cards
+
+    class MenuCard {
+        constructor(imgSrc, imgAlt, title, description, price, parentSelector) {
+            this.imgSrc = imgSrc;
+            this.imgAlt = imgAlt;
+            this.title = title;
+            this.description = description;
+            this.price = price;
+            this.parent = document.querySelector(parentSelector);
+            this.exchangeRate = 100;
+            this.currencyConversion();
+        }
+        currencyConversion() {
+            this.price *= this.exchangeRate;
+        }
+
+        render() {
+            const card = document.createElement("div");
+            card.innerHTML = `
+                <div class="menu__item">
+                    <img src=${this.imgSrc} alt=${this.imgAlt}>
+                    <h3 class="menu__item-subtitle">${this.title}</h3>
+                    <div class="menu__item-descr">${this.description}</div>
+                    <div class="menu__item-divider"></div>
+                    <div class="menu__item-price">
+                        <div class="menu__item-cost">Цена:</div>
+                        <div class="menu__item-total"><span>${this.price}</span> рублей/день</div>
+                    </div>
+                </div>
+            `;
+            this.parent.append(card);
+        }
+    }
+
+    new MenuCard(
+        "img/tabs/vegy.jpg",
+        "vegy",
+        'Меню "Фитнес"',
+        'Меню "Фитнес" - это новый подход к приготовлению блюд: больше свежих овощей и фруктов. Продукт активных и здоровых людей. Это абсолютно новый продукт с оптимальной ценой и высоким качеством!',
+        9,
+        ".menu .container"
+    ).render();
+
+    new MenuCard(
+        "img/tabs/vegy.jpg",
+        "vegy",
+        'Меню "Фитнес"',
+        'Меню "Фитнес" - это новый подход к приготовлению блюд: больше свежих овощей и фруктов. Продукт активных и здоровых людей. Это абсолютно новый продукт с оптимальной ценой и высоким качеством!',
+        9,
+        ".menu .container"
+    ).render();
+
+    new MenuCard(
+        "img/tabs/vegy.jpg",
+        "vegy",
+        'Меню "Фитнес"',
+        'Меню "Фитнес" - это новый подход к приготовлению блюд: больше свежих овощей и фруктов. Продукт активных и здоровых людей. Это абсолютно новый продукт с оптимальной ценой и высоким качеством!',
+        9,
+        ".menu .container"
+    ).render();
+
+    new MenuCard(
+        "img/tabs/vegy.jpg",
+        "vegy",
+        'Меню "Фитнес"',
+        'Меню "Фитнес" - это новый подход к приготовлению блюд: больше свежих овощей и фруктов. Продукт активных и здоровых людей. Это абсолютно новый продукт с оптимальной ценой и высоким качеством!',
+        9,
+        ".menu .container"
+    ).render();
+
+
+
+
 
     
 
