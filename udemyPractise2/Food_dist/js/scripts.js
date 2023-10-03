@@ -112,9 +112,9 @@ window.addEventListener("DOMContentLoaded", () => {
           openModalButtons = document.querySelectorAll("[data-modal]"),
           closeModalButtons = document.querySelectorAll("[data-close]");
 
-    // const modalTimerId = setTimeout(() => {
-    //         openModalWindow(modalWindow);
-    //       }, 5000);
+    const modalTimerId = setTimeout(() => {
+            openModalWindow(modalWindow);
+          }, 5000);
 
     function openModalWindow(modalElement) {
         modalElement.classList.toggle("show");
@@ -205,26 +205,17 @@ window.addEventListener("DOMContentLoaded", () => {
     ).render();
 
     new MenuCard(
-        "img/tabs/vegy.jpg",
-        "vegy",
-        'Меню "Фитнес"',
-        'Меню "Фитнес" - это новый подход к приготовлению блюд: больше свежих овощей и фруктов. Продукт активных и здоровых людей. Это абсолютно новый продукт с оптимальной ценой и высоким качеством!',
+        "img/tabs/elite.jpg",
+        "elite",
+        'Меню "Премиум"',
+        'В меню "Премиум" мы используем не только красивый дизайн упаковки, но и качественное исполнение блюд. Красная рыба, морепродукты, фрукты - ресторанное меню без похода в ресторан!',
         9,
         ".menu .container"
     ).render();
 
     new MenuCard(
-        "img/tabs/vegy.jpg",
-        "vegy",
-        'Меню "Фитнес"',
-        'Меню "Фитнес" - это новый подход к приготовлению блюд: больше свежих овощей и фруктов. Продукт активных и здоровых людей. Это абсолютно новый продукт с оптимальной ценой и высоким качеством!',
-        9,
-        ".menu .container"
-    ).render();
-
-    new MenuCard(
-        "img/tabs/vegy.jpg",
-        "vegy",
+        "img/tabs/post.jpg",
+        "post",
         'Меню "Фитнес"',
         'Меню "Фитнес" - это новый подход к приготовлению блюд: больше свежих овощей и фруктов. Продукт активных и здоровых людей. Это абсолютно новый продукт с оптимальной ценой и высоким качеством!',
         9,
