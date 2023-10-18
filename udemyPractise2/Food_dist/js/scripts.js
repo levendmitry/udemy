@@ -243,11 +243,11 @@ window.addEventListener("DOMContentLoaded", () => {
                 display: block;
                 margin: 0 auto;
             `;
-            form.append(statusMessage);
+            form.insertAdjacentElement("afterend", statusMessage);
 
-            const request = new XMLHttpRequest();
-            request.open("POST", "server1.php");
-            request.setRequestHeader("Content-type", "application-json");
+            // const request = new XMLHttpRequest();
+            // request.open("POST", "server.php");
+            // request.setRequestHeader("Content-type", "application-json");
 
             const formData = new FormData(form);
             const objectData = {};
@@ -256,21 +256,22 @@ window.addEventListener("DOMContentLoaded", () => {
                 objectData[dataKey] = dataValue;
             });
 
-            const jsonData = JSON.stringify(objectData);
-
-
-            request.send(jsonData);
-
-            request.addEventListener("load", () => {
-                if (request.status === 200) {
-                    console.log(request.response, message.success);
-                    showThanksModal(message.success);
-                    form.reset();
-                    statusMessage.remove();
-                } else {
-                    showThanksModal(message.failure);
-                    statusMessage.remove();
-                }
+            fetch("server.php", {
+                method: "POST",
+                body: JSON.stringify(objectData),
+                headers: {
+                    "Content-type": "application-json"
+                },
+            })
+            .then((data) => data.text())
+            .then((data) => {
+                console.log(data);
+                showThanksModal(message.success);
+            })
+            .catch(() => showThanksModal(message.failure))
+            .finally(() => {
+                form.reset();
+                statusMessage.remove();
             });
         });
     }
@@ -290,8 +291,6 @@ window.addEventListener("DOMContentLoaded", () => {
             </div>
         `;
 
-        console.log("12345");
-
         document.querySelector(".modal").append(thanksModalWindow);
 
         setTimeout( () => {
@@ -300,9 +299,8 @@ window.addEventListener("DOMContentLoaded", () => {
             contactModal.classList.remove("hide");
             closeModalWindow();
         }, 4000);
-
-
     }
+
 
 
 
