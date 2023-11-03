@@ -193,82 +193,72 @@ window.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    new MenuCard(
-        "img/tabs/vegy.jpg",
-        "vegy",
-        'Меню "Фитнес"',
-        'Меню "Фитнес" - это новый подход к приготовлению блюд: больше свежих овощей и фруктов. Продукт активных и здоровых людей. Это абсолютно новый продукт с оптимальной ценой и высоким качеством!',
-        9,
-        ".menu .container"
-    ).render();
+    const getCards = async (url) => {
+        const result = await fetch(url);
 
-    new MenuCard(
-        "img/tabs/post.jpg",
-        "post",
-        'Меню "Постное"',
-        'Меню “Постное” - это тщательный подбор ингредиентов: полное отсутствие продуктов животного происхождения, молоко из миндаля, овса, кокоса или гречки, правильное количество белков за счет тофу и импортных вегетарианских стейков.',
-        14,
-        ".menu .container"
-    ).render();
+        if(!result.ok) {
+            throw new Error(`Could not fetch ${url} status: ${result.status}`);
+        }
+        return await result.json();
+    }
 
-    new MenuCard(
-        "img/tabs/elite.jpg",
-        "elite",
-        'Меню “Премиум”',
-        'В меню “Премиум” мы используем не только красивый дизайн упаковки, но и качественное исполнение блюд. Красная рыба, морепродукты, фрукты - ресторанное меню без похода в ресторан!',
-        21,
-        ".menu .container"
-    ).render();
+    getCards("http://localhost:3000/menu")
+    .then(cards => {
+        cards.forEach(({img, altimg, title, descr, price}) => {
+            new MenuCard(img, altimg, title, descr, price, ".menu .container").render();
+        });
+    });
 
     //Forms
 
     const forms = document.querySelectorAll("form");
-    const message = {
+
+    const formStatusMessages = {
         loading: "img/form/spinner.svg",
         success: "Thank you, see you later",
         failure: "Something went wrong"
     };
 
     forms.forEach(form => {
-        postData(form);
+        formingData(form);
     });
 
-    function postData(form) {
+    const postData = async (url, data) => {
+        const fetchOptions = {
+            method: "POST",
+            body: data,
+            headers: {
+                "Content-type": "application/json"
+            }, 
+        };
+        const result = await fetch(url, fetchOptions);
+
+        return await result.json();
+    }
+
+    function formingData(form) {
         form.addEventListener("submit", (event) => {
             event.preventDefault();
 
             let statusMessage = document.createElement("img");
-            statusMessage.src = message.loading;
+            statusMessage.src = formStatusMessages.loading;
             statusMessage.style.cssText = `
                 display: block;
                 margin: 0 auto;
             `;
             form.insertAdjacentElement("afterend", statusMessage);
 
-            // const request = new XMLHttpRequest();
-            // request.open("POST", "server.php");
-            // request.setRequestHeader("Content-type", "application-json");
-
             const formData = new FormData(form);
-            const objectData = {};
-
-            formData.forEach((dataValue, dataKey) => {
-                objectData[dataKey] = dataValue;
-            });
-
-            fetch("server.php", {
-                method: "POST",
-                body: JSON.stringify(objectData),
-                headers: {
-                    "Content-type": "application-json"
-                },
-            })
-            .then((data) => data.text())
+            const jsonFormData = JSON.stringify(Object.fromEntries(formData
+                .entries()));
+            
+            postData("http://localhost:3000/requests", jsonFormData)
             .then((data) => {
-                console.log(data);
-                showThanksModal(message.success);
+                showThanksModal(formStatusMessages.success);
             })
-            .catch(() => showThanksModal(message.failure))
+            .catch(() => {
+                showThanksModal(formStatusMessages.failure)
+            })
             .finally(() => {
                 form.reset();
                 statusMessage.remove();
@@ -301,6 +291,66 @@ window.addEventListener("DOMContentLoaded", () => {
         }, 4000);
     }
 
+    fetch("http://localhost:3000/menu")
+        .then(data => data.json())
+        .then(result => console.log(result));
+
+    //Slider
+
+    const slides = document.querySelectorAll(".offer__slide");
+    const prevSlideArrow = document.querySelector(".offer__slider-prev");
+    const nextSlideArrow = document.querySelector(".offer__slider-next");
+    const totalSlidesNumber = document.querySelector("#total");
+    const currentSlideNumber = document.querySelector("#current");
+    let shownSlideIndex = 1;
+
+    // function showSlide(currentSlide) {
+    //     if (currentSlide > slides.length) {
+    //         currentSlide = 1;
+    //     }
+
+    //     if (currentSlide < 1) {
+    //         currentSlide = slides.length;
+    //     }
+
+    //     slides.forEach(slide => slide.classList.add("hide"));
+    //     slides[currentSlide - 1].classList.remove("hide");
+    //     showCurrentSlideCounter(currentSlide);
+
+    // }
+
+    // function showTotalSlidesCounter(totalSlides) {
+    //     if (totalSlides < 10) {
+    //         totalSlides = addZeroToSlidesNum(totalSlides);
+    //     }
+    //     totalSlidesNumber.textContent = totalSlides;
+    // }
+
+    // function showCurrentSlideCounter(currentSlide) {
+    //     if (currentSlide < 10) {
+    //         currentSlide = addZeroToSlidesNum(currentSlide);
+    //     }
+    //     currentSlideNumber.textContent = currentSlide;
+    // }
+
+    // function addZeroToSlidesNum(slideNumber) {
+    //     return slideNumber = `0${slideNumber}`;
+    // }
+
+    // function showNextSlide(slideChangeNum) {
+    //     showSlide(shownSlideIndex += slideChangeNum);
+    // }
+
+    // nextSlideArrow.addEventListener("click", () => {
+    //     showNextSlide(1);
+    // });
+
+    // prevSlideArrow.addEventListener("click", () => {
+    //     showNextSlide(-1);
+    // });
+
+    // showSlide(shownSlideIndex);
+    // showTotalSlidesCounter(slides.length);
 
 
 
@@ -309,19 +359,5 @@ window.addEventListener("DOMContentLoaded", () => {
     
 
 
-
-
-
-
     
-
-
-
-   
-
-
-
-
-
-
 });
