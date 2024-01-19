@@ -193,19 +193,20 @@ window.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    const getCards = async (url) => {
+    const getResource = async (url) => {
         const result = await fetch(url);
 
         if(!result.ok) {
-            throw new Error(`Could not fetch ${url} status: ${result.status}`);
+            throw new Error(`Could not fetch ${url}, status: ${result.status}`);
         }
         return await result.json();
     }
 
-    getCards("http://localhost:3000/menu")
+    getResource("http://localhost:3000/menu")
     .then(cards => {
         cards.forEach(({img, altimg, title, descr, price}) => {
-            new MenuCard(img, altimg, title, descr, price, ".menu .container").render();
+            new MenuCard(img, altimg, title, descr, price, ".menu .container")
+            .render();
         });
     });
 
@@ -291,73 +292,175 @@ window.addEventListener("DOMContentLoaded", () => {
         }, 4000);
     }
 
-    fetch("http://localhost:3000/menu")
-        .then(data => data.json())
-        .then(result => console.log(result));
-
     //Slider
 
-    const slides = document.querySelectorAll(".offer__slide");
-    const prevSlideArrow = document.querySelector(".offer__slider-prev");
-    const nextSlideArrow = document.querySelector(".offer__slider-next");
-    const totalSlidesNumber = document.querySelector("#total");
-    const currentSlideNumber = document.querySelector("#current");
-    let shownSlideIndex = 1;
+    const slides = document.querySelectorAll(".offer__slide"),
+          slider = document.querySelector(".offer__slider"),
+          prevSlideArrow = document.querySelector(".offer__slider-prev"),
+          nextSlideArrow = document.querySelector(".offer__slider-next"),
+          totalSlidesCounter = document.querySelector("#total"),
+          currentSlideCounter = document.querySelector("#current"),
+          slidesWrapper = document.querySelector(".offer__slider-wrapper"),
+          slidesField = document.querySelector(".offer__slider-inner"),
+          widthSlidesWrapper = window.getComputedStyle(slidesWrapper).width,
+          carouselDots = document.createElement("ol");
+    let currentSlideNumber = 1;
+    let slideOffset = 0;
+
+    slidesField.style.width = 100 * slides.length + "%";
+    slides.forEach(slide => slide.style.with = widthSlidesWrapper);
+    slidesField.style.display = "flex";
+    slidesField.style.transition = "0.5s all";
+    slidesWrapper.style.overflow = "hidden";
+    slider.style.position = "relative";
+    carouselDots.classList.add("carousel-dots");
+    slider.append(carouselDots);
+
+    const dots = [];
+
+    for (let i = 0; i < slides.length; i++) {
+        const dot = document.createElement("li");
+        dot.setAttribute("data-slide-to", i + 1);
+        dot.classList.add("dot");
+        carouselDots.append(dot);
+        dots.push(dot);
+    }
+
+    function showDots(currentDotNumber) {
+        dots.forEach(dot => dot.style.opacity = "0.5");
+        dots[currentDotNumber - 1].style.opacity = "1";
+    }
+    
+    function addZeroToSlideNumber(slide) {
+        return slide = `0${slide}`;
+    }
+
+    function showCurrentSlideCounter(currentSlideNumber) {
+        if (currentSlideNumber < 10) {
+            currentSlideNumber = addZeroToSlideNumber(currentSlideNumber);
+        }
+        currentSlideCounter.textContent = currentSlideNumber;
+    }
+
+    function showTotalSlidesCounter(totalSlidesNumber) {
+        if (totalSlidesNumber < 10) {
+            totalSlidesNumber = addZeroToSlideNumber(totalSlidesNumber);
+        }
+        totalSlidesCounter.textContent = totalSlidesNumber;
+    }
+
+    showCurrentSlideCounter(currentSlideNumber);
+    showTotalSlidesCounter(slides.length);
+    dots[currentSlideNumber - 1].style.opacity = "1";
+
+    nextSlideArrow.addEventListener("click", () => {
+        if (slideOffset == +widthSlidesWrapper.slice(0, widthSlidesWrapper.length - 2) * (slides.length - 1)) {
+            slideOffset = 0;
+        } else slideOffset += +widthSlidesWrapper.slice(0, widthSlidesWrapper.length - 2);
+
+        slidesField.style.transform = `translateX(-${slideOffset}px)`;
+        
+        if (currentSlideNumber == slides.length ) {
+            currentSlideNumber = 1;
+        } else {
+            currentSlideNumber++;
+        }
+
+        showCurrentSlideCounter(currentSlideNumber);
+        showDots(currentSlideNumber);
+    });
+
+    prevSlideArrow.addEventListener("click", () => {
+
+        if (slideOffset == 0) {
+            slideOffset = +widthSlidesWrapper.slice(0, widthSlidesWrapper.length - 2) * (slides.length - 1);
+        } else slideOffset -= +widthSlidesWrapper.slice(0, widthSlidesWrapper.length - 2);
+
+        slidesField.style.transform = `translateX(-${slideOffset}px)`;
+
+        if (currentSlideNumber == 1 ) {
+            currentSlideNumber = slides.length;
+        } else {
+            currentSlideNumber--;
+        }
+
+        showCurrentSlideCounter(currentSlideNumber);
+        showDots(currentSlideNumber);
+    });
+
+    dots.forEach(dot => {
+        dot.addEventListener("click", (event) => {
+            const slideTo = event.target.getAttribute("data-slide-to");
+            currentSlideNumber = slideTo;
+
+            slideOffset = +widthSlidesWrapper.slice(0, widthSlidesWrapper.length - 2) * (slideTo - 1);
+
+            slidesField.style.transform = `translateX(-${slideOffset}px)`;
+            showDots(currentSlideNumber);
+            showCurrentSlideCounter(currentSlideNumber);
+
+        });
+    });
+
+    
+
+
+    // slides.forEach(slide => slide.style.width = widthSlidesWrapper);
+    // slides.forEach( slide => slide.classList.add("hide"));
+    // slides[currentSlideNumber - 1].classList.remove("hide");
+
+    // function addZeroToSlideNumber(slide) {
+    //     return slide = `0${slide}`;
+    // }
+
+    // function showCurrentSlideCounter(currentSlideNumber) {
+    //     if (currentSlideNumber < 10) {
+    //         currentSlideNumber = addZeroToSlideNumber(currentSlideNumber);
+    //     }
+
+    //     currentSlideCounter.textContent = currentSlideNumber;
+    // }
+
+    // showCurrentSlideCounter(currentSlideNumber);
+
+    // function showTotalSlidesCounter(totalSlidesNumber) {
+    //     if (totalSlidesNumber < 10) {
+    //         totalSlidesNumber = addZeroToSlideNumber(totalSlidesNumber);
+    //     }
+
+    //     totalSlidesCounter.textContent = totalSlidesNumber;
+    // }
+
+    // showTotalSlidesCounter(slides.length);
 
     // function showSlide(currentSlide) {
     //     if (currentSlide > slides.length) {
-    //         currentSlide = 1;
+    //         currentSlideNumber = 1;
     //     }
 
-    //     if (currentSlide < 1) {
-    //         currentSlide = slides.length;
+    //     if (currentSlide < 1 ) {
+    //         currentSlideNumber = slides.length;
     //     }
 
-    //     slides.forEach(slide => slide.classList.add("hide"));
-    //     slides[currentSlide - 1].classList.remove("hide");
-    //     showCurrentSlideCounter(currentSlide);
 
+    //     showCurrentSlideCounter(currentSlideNumber);
     // }
 
-    // function showTotalSlidesCounter(totalSlides) {
-    //     if (totalSlides < 10) {
-    //         totalSlides = addZeroToSlidesNum(totalSlides);
-    //     }
-    //     totalSlidesNumber.textContent = totalSlides;
-    // }
+    // showSlide(currentSlideNumber);
 
-    // function showCurrentSlideCounter(currentSlide) {
-    //     if (currentSlide < 10) {
-    //         currentSlide = addZeroToSlidesNum(currentSlide);
-    //     }
-    //     currentSlideNumber.textContent = currentSlide;
-    // }
-
-    // function addZeroToSlidesNum(slideNumber) {
-    //     return slideNumber = `0${slideNumber}`;
-    // }
-
-    // function showNextSlide(slideChangeNum) {
-    //     showSlide(shownSlideIndex += slideChangeNum);
+    // function changeSlide(changeSlideNumber) {
+    //     showSlide(currentSlideNumber += changeSlideNumber);
     // }
 
     // nextSlideArrow.addEventListener("click", () => {
-    //     showNextSlide(1);
+    //     changeSlide(1);
+    //     console.log(currentSlideNumber);
     // });
 
     // prevSlideArrow.addEventListener("click", () => {
-    //     showNextSlide(-1);
+    //     changeSlide(-1);
     // });
 
-    // showSlide(shownSlideIndex);
-    // showTotalSlidesCounter(slides.length);
 
 
-
-
-
-    
-
-
-    
 });
